@@ -23,7 +23,9 @@ app.use(morgan('dev'));
 // но пока будем использовать всегда — на всякий случай
 
 // Распознавание входящего объекта в POST-запросе в виде строк или массивов
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({
+  extended: true
+}));
 // Распознавание входящего объекта в POST-запросе как объекта JSON
 app.use(express.json());
 
@@ -33,7 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Отображаем главную страницу с использованием компонента "Main"
 app.get('/', (req, res) => {
   // создаём React-элемент на основе React-компонента
-  const main = React.createElement(Main, req.query);
+  const main = React.createElement(Main, req.query); // {signText: text}
   // рендерим элемент и получаем HTML (в виде строки)
   const html = ReactDOMServer.renderToStaticMarkup(main);
   // отправляем первую строку нашего HTML-документа
@@ -41,6 +43,27 @@ app.get('/', (req, res) => {
   // отправляем отрендеренный HTML и закрываем соединение
   res.end(html);
 });
+
+app.post('/cheers', (req, res) => {
+  console.log(req.body);
+
+  // const { cheer_name } = req.body  // первый способ
+  // if(cheer_name === 'RED HOT') {
+  //   res.redirect(`/?signText=	H-O-T!`)
+  // }
+
+  const obj = { // второй способ
+    'RED HOT': 'H-O-T!',
+    'DO IT AGAIN': 'Go, Fight, Win',
+    '2 BITS': 'Holler!',
+    'STOMP YOUR FEET': 'STOMP!'
+  }
+ 
+  res.redirect(`/?signText=${obj[req.body.cheer_name] ? obj[req.body.cheer_name]: 'Go Team!'}`)
+  
+})
+
+
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
